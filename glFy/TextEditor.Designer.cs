@@ -106,7 +106,7 @@ namespace glFy
             });
 
             exit = new System.Windows.Forms.ToolStripMenuItem();
-            exit.Text = "Exit        Alt-F4";
+            exit.Text = "Exit             Esc";
             exit.Click += Exit_Click;
 
             fileDropDown = new System.Windows.Forms.ToolStripDropDown();
@@ -129,6 +129,13 @@ namespace glFy
             scintilla.MinimumSize = scintilla.Size;
             scintilla.Location = new System.Drawing.Point(0, menuStrip.Size.Height);
             scintilla.Margins[0].Width = 16 + 8 * scintilla.Lines.Count.ToString().Length;
+            scintilla.RawText = System.Text.Encoding.ASCII.GetBytes(
+                "#version 430" + System.Environment.NewLine +
+                "in vec2 fPos;" + System.Environment.NewLine + System.Environment.NewLine +
+                "// Provided Uniforms" + System.Environment.NewLine +
+                "uniform float time;" + System.Environment.NewLine
+            );
+
             scintilla.TextChanged += (delegate (object sender, System.EventArgs e)
             {
                 scintilla.Margins[0].Width = 16 + 8 * scintilla.Lines.Count.ToString().Length;
@@ -201,7 +208,10 @@ namespace glFy
 
         private void Exit_Click(object sender, System.EventArgs e)
         {
-            CloseEditor();
+            if (CloseEditor())
+            {
+                Application.Exit();
+            }
         }
 
         private void MenuStrip_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
