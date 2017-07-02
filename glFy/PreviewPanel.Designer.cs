@@ -14,6 +14,8 @@ namespace glFy
         private VertexBuffer vertexBuffer = null;
         private VertexArray vertexArray = null;
         private System.Windows.Forms.Timer timer = null;
+        private TextEditor editor = null;
+        private Shader[] shaders = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -47,6 +49,15 @@ namespace glFy
             control.MinimumSize = this.Size;
             control.Resize += Control_Resize;
             control.Paint += Control_Paint;
+            
+            this.Controls.Add(control);
+            
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            
             control.MakeCurrent();
 
             float[,] position = new float[6, 2]{
@@ -58,9 +69,10 @@ namespace glFy
                 { -1,    1 }
             };
 
-            Shader fragment = new Shader("../../../assets/fragment.glsl", ShaderType.FragmentShader);
+            Shader fragment = new Shader(editor != null ? editor.FileLocation : "", ShaderType.FragmentShader);
             Shader vertex = new Shader("../../../assets/vertex.glsl", ShaderType.VertexShader);
-            preview = new Scene(new Shader[] { fragment, vertex });
+            shaders = new Shader[] { fragment, vertex };
+            preview = new Scene(shaders);
 
             vertexBuffer = new VertexBuffer(position);
             vertexArray = new VertexArray();
@@ -73,17 +85,36 @@ namespace glFy
             GL.BindVertexArray(0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
-            this.Controls.Add(control);
-            
-        }
-
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 50;
             timer.Tick += (delegate (object sender, EventArgs t)
             {
+                if (editor.Updated)
+                {
+                    foreach (Shader shader in shaders)
+                    {
+                        if (shader.Type == ShaderType.FragmentShader)
+                        {
+                            shader.FileLocation = editor.FileLocation;
+                            shader.Compile();
+                        }
+                    }
+
+                    bool allValid = true;
+                    foreach (Shader shader in shaders)
+                    {
+                        if (shader.Valid == false)
+                        {
+                            allValid = false;
+                        }
+                    }
+
+                    if (allValid)
+                    {
+                        preview.AttachShaders(shaders);
+                    }
+                }
+
                 Control_Paint(this, null);
             });
             timer.Start();

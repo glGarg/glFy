@@ -14,8 +14,9 @@ namespace glFy
 {
     public partial class PreviewPanel : UserControl
     {
-        public PreviewPanel()
+        public PreviewPanel(TextEditor textEditor)
         {
+            editor = textEditor;
             InitializeComponent();
         }
     }

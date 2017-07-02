@@ -9,31 +9,40 @@ namespace glFy
 {
     class Scene
     {
-        private int program;
+        private int id;
 
-        public int Program
+        public int Id
         {
             get
             {
-                return program;
+                return id;
             }
         }
 
         public Scene(Shader[] shaders)
         {
-            program = GL.CreateProgram();
+            id = GL.CreateProgram();
+            AttachShaders(shaders);
+        }
+
+        public void AttachShaders(Shader[] shaders)
+        {
+            foreach (Shader shader in shaders)
+            {
+                GL.AttachShader(id, shader.Id);
+            }
+
+            GL.LinkProgram(id);
 
             foreach (Shader shader in shaders)
             {
-                GL.AttachShader(program, shader.Id);
+                GL.DetachShader(id, shader.Id);
             }
-
-            GL.LinkProgram(program);
         }
 
         public void Use()
         {
-            GL.UseProgram(program);
+            GL.UseProgram(id);
         }
     }
 }

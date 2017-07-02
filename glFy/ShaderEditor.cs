@@ -16,5 +16,10 @@ namespace glFy
         {
             InitializeComponent();
         }
+
+        public string CurrentFilePath()
+        {
+            return textEditor.FileLocation;
+        }
     }
 }

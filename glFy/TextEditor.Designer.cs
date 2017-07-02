@@ -1,4 +1,6 @@
-﻿namespace glFy
+﻿using System.IO;
+
+namespace glFy
 {
     partial class TextEditor
     {
@@ -10,16 +12,32 @@
         private System.Windows.Forms.ToolStripMenuItem file = null;
         private System.Windows.Forms.ToolStripDropDown fileDropDown = null;
         private System.Windows.Forms.ToolStripMenuItem open = null;
+        private System.Windows.Forms.ToolStripMenuItem save = null;
         private System.Windows.Forms.OpenFileDialog openFileDialog = null;
         private System.Windows.Forms.SaveFileDialog saveFileDialog = null;
         private ScintillaNET.Scintilla scintilla = null;
         private string fileLocation = null;
-
+        private bool updated = false;
+        
         public string FileLocation
         {
             get
             {
                 return fileLocation;
+            }
+        }
+
+        public bool Updated
+        {
+            get
+            {
+                if (updated == true)
+                {
+                    updated = false;
+                    return true;
+                }
+
+                return false;
             }
         }
 
@@ -60,14 +78,35 @@
                 if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
                     // open text in textbox
+                    fileLocation = openFileDialog.FileName;
+                    scintilla.RawText = File.ReadAllBytes(fileLocation);
+                    updated = true;
                 }
             });
 
             saveFileDialog = new System.Windows.Forms.SaveFileDialog();
             saveFileDialog.Filter = "Shader Files|*.glsl;*.frag";
 
+            save = new System.Windows.Forms.ToolStripMenuItem();
+            save.Text = "Save";
+            save.Click += (delegate (object sender, System.EventArgs e)
+            {
+                if (fileLocation == null && saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    // open text in textbox
+                    fileLocation = saveFileDialog.FileName;
+                }
+
+                if (fileLocation != null)
+                {
+                    WriteTextToFile(fileLocation);
+                    updated = true;
+                }
+            });
+            
             fileDropDown = new System.Windows.Forms.ToolStripDropDown();
             fileDropDown.Items.Add(open);
+            fileDropDown.Items.Add(save);
 
             file = new System.Windows.Forms.ToolStripMenuItem();
             file.Text = "File";
@@ -112,6 +151,8 @@
                     if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         fileLocation = openFileDialog.FileName;
+                        scintilla.RawText = File.ReadAllBytes(fileLocation);
+                        updated = true;
                     }
                 }
                 else if (e.KeyCode == System.Windows.Forms.Keys.S)
@@ -122,16 +163,30 @@
                         {
                             // write file at this location with given name
                             fileLocation = saveFileDialog.FileName;
+                            WriteTextToFile(fileLocation);
                         }
                     }
                     else
                     {
                         // use saved name
+                        WriteTextToFile(fileLocation);
                     }
                 }
             }
 
             this.ActiveControl = scintilla;
+        }
+
+        private void WriteTextToFile(string filepath)
+        {
+            using (StreamWriter sw = File.CreateText(filepath))
+            {
+                foreach (ScintillaNET.Line line in scintilla.Lines)
+                {
+                    sw.WriteLine(line.Text);
+                }
+            }
+            updated = true;
         }
 
         private void TextEditor_SizeChanged(object sender, System.EventArgs e)

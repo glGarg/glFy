@@ -36,14 +36,14 @@
             this.Size = new System.Drawing.Size(800, 500);
             this.SuspendLayout();
 
-            panel = new PreviewPanel();
-            panel.Location = new System.Drawing.Point(400, 0);
-
             textEditor = new TextEditor();
 
-            this.Controls.Add(panel);
+            panel = new PreviewPanel(textEditor);
+            panel.Location = new System.Drawing.Point(400, 0);
+            
             this.Controls.Add(textEditor);
-
+            this.Controls.Add(panel);
+            this.ActiveControl = textEditor;
             this.ResumeLayout();
         }
 
