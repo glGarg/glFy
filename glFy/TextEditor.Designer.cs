@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Windows.Forms;
 
 namespace glFy
 {
@@ -13,12 +14,14 @@ namespace glFy
         private System.Windows.Forms.ToolStripDropDown fileDropDown = null;
         private System.Windows.Forms.ToolStripMenuItem open = null;
         private System.Windows.Forms.ToolStripMenuItem save = null;
+        private System.Windows.Forms.ToolStripMenuItem exit = null;
         private System.Windows.Forms.OpenFileDialog openFileDialog = null;
         private System.Windows.Forms.SaveFileDialog saveFileDialog = null;
         private ScintillaNET.Scintilla scintilla = null;
         private string fileLocation = null;
         private bool updated = false;
-        
+        private bool textChanged = false;
+
         public string FileLocation
         {
             get
@@ -72,7 +75,7 @@ namespace glFy
             openFileDialog.Filter = "Shader Files|*.glsl;*.frag";
 
             open = new System.Windows.Forms.ToolStripMenuItem();
-            open.Text = "Open";
+            open.Text = "Open    Ctrl-O";
             open.Click += (delegate (object sender, System.EventArgs e) 
             {
                 if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -88,7 +91,7 @@ namespace glFy
             saveFileDialog.Filter = "Shader Files|*.glsl;*.frag";
 
             save = new System.Windows.Forms.ToolStripMenuItem();
-            save.Text = "Save";
+            save.Text = "Save      Ctrl-S";
             save.Click += (delegate (object sender, System.EventArgs e)
             {
                 if (fileLocation == null && saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -103,10 +106,15 @@ namespace glFy
                     updated = true;
                 }
             });
-            
+
+            exit = new System.Windows.Forms.ToolStripMenuItem();
+            exit.Text = "Exit        Alt-F4";
+            exit.Click += Exit_Click;
+
             fileDropDown = new System.Windows.Forms.ToolStripDropDown();
             fileDropDown.Items.Add(open);
             fileDropDown.Items.Add(save);
+            fileDropDown.Items.Add(exit);
 
             file = new System.Windows.Forms.ToolStripMenuItem();
             file.Text = "File";
@@ -114,6 +122,7 @@ namespace glFy
 
             menuStrip = new System.Windows.Forms.MenuStrip();
             menuStrip.Items.Add(file);
+            menuStrip.KeyDown += MenuStrip_KeyDown;
 
             scintilla = new ScintillaNET.Scintilla();
             scintilla.ConfigurationManager.Language = "cpp";
@@ -125,16 +134,21 @@ namespace glFy
             scintilla.TextChanged += (delegate (object sender, System.EventArgs e)
             {
                 scintilla.Margins[0].Width = 16 + 8 * scintilla.Lines.Count.ToString().Length;
+                textChanged = true;
             });
             scintilla.KeyDown += (delegate (object sender, System.Windows.Forms.KeyEventArgs e)
             {
+                if (e.KeyCode == System.Windows.Forms.Keys.Escape)
+                {
+                    Exit_Click(sender, e);
+                }
+
                 if (e.KeyCode == System.Windows.Forms.Keys.ControlKey)
                 {
-                    this.ActiveControl = null;
+                    this.ActiveControl = menuStrip;
                 }
             });
 
-            this.KeyDown += TextEditor_KeyDown;
             this.Controls.Add(menuStrip);
             this.Controls.Add(scintilla);
             this.SizeChanged += TextEditor_SizeChanged;
@@ -142,7 +156,45 @@ namespace glFy
             this.ResumeLayout();
         }
 
-        private void TextEditor_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
+        private void Exit_Click(object sender, System.EventArgs e)
+        {
+            // ask user if they need to save
+            if (textChanged)
+            {
+                System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show("Save chages?", "Save Changes",
+                                                                                            System.Windows.Forms.MessageBoxButtons.YesNoCancel,
+                                                                                            System.Windows.Forms.MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    if (null != fileLocation)
+                    {
+                        WriteTextToFile(fileLocation);
+                    }
+                    else
+                    {
+                        if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        {
+                            // write file at this location with given name
+                            fileLocation = saveFileDialog.FileName;
+                            WriteTextToFile(fileLocation);
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    // save
+                }
+                else if (result == DialogResult.Cancel)
+                {
+                    return;
+                }
+            }
+
+            System.Windows.Forms.Application.Exit();
+        }
+
+        private void MenuStrip_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
         {
             if (e.Modifiers == System.Windows.Forms.Keys.Control)
             {
@@ -184,6 +236,7 @@ namespace glFy
                 sw.Write(scintilla.Text);
             }
             updated = true;
+            textChanged = false;
         }
 
         private void TextEditor_SizeChanged(object sender, System.EventArgs e)
