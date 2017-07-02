@@ -4,9 +4,8 @@
 
 in vec2 fPos;
 
-
 void main(){
 
-	gl_FragColor = vec4(0.5 * (fPos + 1.), 1., 1.);
+	gl_FragColor = sin(time) * vec4(0.5 * (fPos + 1.), 1., 1.);
 
 }

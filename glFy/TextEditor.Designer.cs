@@ -181,10 +181,7 @@ namespace glFy
         {
             using (StreamWriter sw = File.CreateText(filepath))
             {
-                foreach (ScintillaNET.Line line in scintilla.Lines)
-                {
-                    sw.WriteLine(line.Text);
-                }
+                sw.Write(scintilla.Text);
             }
             updated = true;
         }
