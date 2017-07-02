@@ -16,6 +16,7 @@ namespace glFy
         private System.Windows.Forms.Timer timer = null;
         private TextEditor editor = null;
         private Shader[] shaders = null;
+        private DateTime start;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -49,7 +50,9 @@ namespace glFy
             control.MinimumSize = this.Size;
             control.Resize += Control_Resize;
             control.Paint += Control_Paint;
-            
+
+            start = DateTime.Now;
+
             this.Controls.Add(control);
             
         }
@@ -84,6 +87,10 @@ namespace glFy
             GL.EnableVertexAttribArray(0);
             GL.BindVertexArray(0);
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            
+            preview.Use();
+            GL.Uniform1(GL.GetUniformLocation(preview.Id, "time"), (DateTime.Now - start).TotalSeconds);
+            GL.UseProgram(0);
 
             timer = new System.Windows.Forms.Timer();
             timer.Interval = 50;
@@ -111,7 +118,10 @@ namespace glFy
 
                     if (allValid)
                     {
+                        start = DateTime.Now;
                         preview.AttachShaders(shaders);
+                        preview.Use();
+                        GL.UseProgram(0);
                     }
                 }
 
@@ -125,6 +135,7 @@ namespace glFy
             GL.ClearColor(System.Drawing.Color.SkyBlue);
             GL.Clear(ClearBufferMask.ColorBufferBit);
             preview.Use();
+            GL.Uniform1(GL.GetUniformLocation(preview.Id, "time"), (float)(DateTime.Now - start).TotalSeconds);
             vertexBuffer.Bind();
             vertexArray.Bind();
             GL.DrawArrays(PrimitiveType.TriangleStrip, 0, vertexBuffer.VertexCount());
