@@ -7,10 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using OpenTK.Graphics.OpenGL;
+using OpenTK;
 
 namespace glFy
 {
-    public partial class PreviewPanel : Form
+    public partial class PreviewPanel : UserControl
     {
         public PreviewPanel()
         {

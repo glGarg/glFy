@@ -15,6 +15,14 @@
         private ScintillaNET.Scintilla scintilla = null;
         private string fileLocation = null;
 
+        public string FileLocation
+        {
+            get
+            {
+                return fileLocation;
+            }
+        }
+
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -39,7 +47,7 @@
             this.components = new System.ComponentModel.Container();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Text = "TextEditor";
-            this.MinimumSize = new System.Drawing.Size(800, 600);
+            this.MinimumSize = new System.Drawing.Size(400, 500);
             this.SuspendLayout();
 
             openFileDialog = new System.Windows.Forms.OpenFileDialog();

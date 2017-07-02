@@ -1,11 +1,13 @@
 ﻿namespace glFy
 {
-    partial class Form1
+    partial class ShaderEditor
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
+        private TextEditor textEditor = null;
+        private PreviewPanel panel = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -30,10 +32,21 @@
         {
             this.components = new System.ComponentModel.Container();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Text = "Form1";
+            this.Text = "ShaderEditor";
+            this.Size = new System.Drawing.Size(800, 500);
+            this.SuspendLayout();
+
+            panel = new PreviewPanel();
+            panel.Location = new System.Drawing.Point(400, 0);
+
+            textEditor = new TextEditor();
+
+            this.Controls.Add(panel);
+            this.Controls.Add(textEditor);
+
+            this.ResumeLayout();
         }
 
         #endregion
     }
 }
-

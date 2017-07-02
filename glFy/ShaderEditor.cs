@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace glFy
 {
-    public partial class Form1 : Form
+    public partial class ShaderEditor : Form
     {
-        public Form1()
+        public ShaderEditor()
         {
             InitializeComponent();
         }

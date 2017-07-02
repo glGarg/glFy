@@ -11,7 +11,7 @@ using ScintillaNET;
 
 namespace glFy
 {
-    public partial class TextEditor : Form
+    public partial class TextEditor : UserControl
     {
         public TextEditor()
         {
