@@ -30,9 +30,7 @@ namespace glFy
             }
             base.Dispose(disposing);
         }
-
-        #region Windows Form Designer generated code
-
+        
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
@@ -150,7 +148,5 @@ namespace glFy
             GL.ClearColor(System.Drawing.Color.Crimson);
             GL.Viewport(0, 0, this.Width, this.Height);
         }
-        
-        #endregion
     }
 }

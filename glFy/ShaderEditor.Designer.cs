@@ -1,4 +1,6 @@
-﻿namespace glFy
+﻿using System.Windows.Forms;
+
+namespace glFy
 {
     partial class ShaderEditor
     {
@@ -22,7 +24,15 @@
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (!textEditor.CloseEditor())
+            {
+                e.Cancel = true;
+                return;
+            }
+            base.OnFormClosing(e);
+        }
 
         /// <summary>
         /// Required method for Designer support - do not modify
@@ -46,7 +56,5 @@
             this.ActiveControl = textEditor;
             this.ResumeLayout();
         }
-
-        #endregion
     }
 }

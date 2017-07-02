@@ -57,8 +57,6 @@ namespace glFy
             base.Dispose(disposing);
         }
 
-        #region Windows Form Designer generated code
-
         /// <summary>
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
@@ -156,19 +154,20 @@ namespace glFy
             this.ResumeLayout();
         }
 
-        private void Exit_Click(object sender, System.EventArgs e)
+        public bool CloseEditor()
         {
             // ask user if they need to save
             if (textChanged)
             {
                 System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show("Save chages?", "Save Changes",
-                                                                                            System.Windows.Forms.MessageBoxButtons.YesNoCancel,
-                                                                                            System.Windows.Forms.MessageBoxIcon.Question);
+                                                                                                System.Windows.Forms.MessageBoxButtons.YesNoCancel,
+                                                                                                System.Windows.Forms.MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
                     if (null != fileLocation)
                     {
                         WriteTextToFile(fileLocation);
+                        System.Windows.Forms.Application.Exit();
                     }
                     else
                     {
@@ -177,21 +176,32 @@ namespace glFy
                             // write file at this location with given name
                             fileLocation = saveFileDialog.FileName;
                             WriteTextToFile(fileLocation);
+                            System.Windows.Forms.Application.Exit();
                         }
                         else
                         {
-                            return;
+                            return false;
                         }
                     }
                     // save
                 }
-                else if (result == DialogResult.Cancel)
+                else if (result == DialogResult.No)
                 {
-                    return;
+                    textChanged = false;
+                    System.Windows.Forms.Application.Exit();
+                }
+                else
+                {
+                    return false;
                 }
             }
 
-            System.Windows.Forms.Application.Exit();
+            return true;
+        }
+
+        private void Exit_Click(object sender, System.EventArgs e)
+        {
+            CloseEditor();
         }
 
         private void MenuStrip_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
@@ -243,7 +253,5 @@ namespace glFy
         {
             scintilla.Size = new System.Drawing.Size(this.Size.Width - 20, this.Size.Height - menuStrip.Size.Height - 43);
         }
-
-        #endregion
     }
 }
