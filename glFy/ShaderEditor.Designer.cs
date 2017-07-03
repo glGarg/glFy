@@ -43,14 +43,21 @@ namespace glFy
             this.components = new System.ComponentModel.Container();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Text = "ShaderEditor";
-            this.Size = new System.Drawing.Size(800, 500);
+            this.MinimumSize = new System.Drawing.Size(800, 500);
             this.SuspendLayout();
 
             textEditor = new TextEditor();
 
             panel = new PreviewPanel(textEditor);
             panel.Location = new System.Drawing.Point(400, 0);
-            
+
+            this.SizeChanged += (delegate (object sender, System.EventArgs e)
+            {
+                panel.Location = new System.Drawing.Point(this.Size.Width / 2, 0);
+                panel.Size = new System.Drawing.Size(this.Size.Width/2, this.Size.Height);
+                textEditor.Size = panel.Size;
+            });
+
             this.Controls.Add(textEditor);
             this.Controls.Add(panel);
             this.ActiveControl = textEditor;

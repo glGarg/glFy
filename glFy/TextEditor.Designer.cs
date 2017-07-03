@@ -138,6 +138,10 @@ namespace glFy
                 }
             });
 
+            this.SizeChanged += (delegate (object sender, System.EventArgs e)
+            {
+                scintilla.Size = new System.Drawing.Size(this.Size.Width - 20, this.Size.Height - menuStrip.Size.Height - 43);
+            });
             this.Controls.Add(menuStrip);
             this.Controls.Add(scintilla);
             this.SizeChanged += TextEditor_SizeChanged;
@@ -227,6 +231,8 @@ namespace glFy
             {
                 fileLocation = openFileDialog.FileName;
                 scintilla.RawText = File.ReadAllBytes(fileLocation);
+                updated = true;
+                textChanged = false;
             }
         }
 

@@ -41,18 +41,23 @@ namespace glFy
             this.components = new System.ComponentModel.Container();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Text = "PreviewPanel";
-            this.Size = new System.Drawing.Size(400, 500);
+            this.MinimumSize = new System.Drawing.Size(400, 500);
+            this.SuspendLayout();
 
             control = new OpenTK.GLControl();
-            control.Size = this.Size;
-            control.MinimumSize = this.Size;
+            control.Location = new System.Drawing.Point(5, 5);
+            control.MinimumSize = new System.Drawing.Size(375, 452);
             control.Resize += Control_Resize;
             control.Paint += Control_Paint;
 
             start = DateTime.Now;
 
+            this.SizeChanged += (delegate (object sender, System.EventArgs e)
+            {
+                control.Size = new System.Drawing.Size(this.Size.Width - 25, this.Size.Height - 48);
+            });
             this.Controls.Add(control);
-            
+            this.ResumeLayout();
         }
 
         protected override void OnLoad(EventArgs e)
