@@ -17,6 +17,14 @@ namespace glFy
         private ShaderType type;
         private string fileLocation = null;
 
+        public string DefaultFragmentShader
+        {
+            get
+            {
+                return defaultFragmentShader;
+            }
+        }
+
         public ShaderType Type
         {
             get

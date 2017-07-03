@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Windows.Forms;
 
 namespace glFy
@@ -12,6 +13,7 @@ namespace glFy
         private System.Windows.Forms.MenuStrip menuStrip = null;
         private System.Windows.Forms.ToolStripMenuItem file = null;
         private System.Windows.Forms.ToolStripDropDown fileDropDown = null;
+        private System.Windows.Forms.ToolStripMenuItem newFile = null;
         private System.Windows.Forms.ToolStripMenuItem open = null;
         private System.Windows.Forms.ToolStripMenuItem save = null;
         private System.Windows.Forms.ToolStripMenuItem exit = null;
@@ -19,6 +21,7 @@ namespace glFy
         private System.Windows.Forms.SaveFileDialog saveFileDialog = null;
         private ScintillaNET.Scintilla scintilla = null;
         private string fileLocation = null;
+        private string starterCode = "";
         private bool updated = false;
         private bool textChanged = false;
 
@@ -69,8 +72,20 @@ namespace glFy
             this.MinimumSize = new System.Drawing.Size(400, 500);
             this.SuspendLayout();
 
+            starterCode = "#version 430" + System.Environment.NewLine +
+                          "in vec2 fPos;" + System.Environment.NewLine + System.Environment.NewLine +
+                          "// Provided Uniforms" + System.Environment.NewLine +
+                          "uniform float time;" + System.Environment.NewLine;
+
             openFileDialog = new System.Windows.Forms.OpenFileDialog();
             openFileDialog.Filter = "Shader Files|*.glsl;*.frag";
+
+            newFile = new ToolStripMenuItem();
+            newFile.Text = "New      Ctrl-N";
+            newFile.Click += (delegate (object sender, System.EventArgs e)
+            {
+                OpenNewFile();
+            });
 
             open = new System.Windows.Forms.ToolStripMenuItem();
             open.Text = "Open    Ctrl-O";
@@ -90,10 +105,11 @@ namespace glFy
             });
 
             exit = new System.Windows.Forms.ToolStripMenuItem();
-            exit.Text = "Exit             Esc";
+            exit.Text = "Exit            Esc";
             exit.Click += Exit_Click;
 
             fileDropDown = new System.Windows.Forms.ToolStripDropDown();
+            fileDropDown.Items.Add(newFile);
             fileDropDown.Items.Add(open);
             fileDropDown.Items.Add(save);
             fileDropDown.Items.Add(exit);
@@ -104,7 +120,6 @@ namespace glFy
 
             menuStrip = new System.Windows.Forms.MenuStrip();
             menuStrip.Items.Add(file);
-            menuStrip.KeyDown += MenuStrip_KeyDown;
 
             scintilla = new ScintillaNET.Scintilla();
             scintilla.ConfigurationManager.Language = "cpp";
@@ -113,13 +128,7 @@ namespace glFy
             scintilla.MinimumSize = scintilla.Size;
             scintilla.Location = new System.Drawing.Point(0, menuStrip.Size.Height);
             scintilla.Margins[0].Width = 16 + 8 * scintilla.Lines.Count.ToString().Length;
-            scintilla.RawText = System.Text.Encoding.ASCII.GetBytes(
-                "#version 430" + System.Environment.NewLine +
-                "in vec2 fPos;" + System.Environment.NewLine + System.Environment.NewLine +
-                "// Provided Uniforms" + System.Environment.NewLine +
-                "uniform float time;" + System.Environment.NewLine
-            );
-
+            scintilla.Text = starterCode;
             scintilla.TextChanged += (delegate (object sender, System.EventArgs e)
             {
                 scintilla.Margins[0].Width = 16 + 8 * scintilla.Lines.Count.ToString().Length;
@@ -132,11 +141,23 @@ namespace glFy
                     Exit_Click(sender, e);
                 }
 
-                if (e.KeyCode == System.Windows.Forms.Keys.ControlKey)
+                if (e.Modifiers == System.Windows.Forms.Keys.Control)
                 {
-                    this.ActiveControl = menuStrip;
+                    if (e.KeyCode == System.Windows.Forms.Keys.O)
+                    {
+                        OpenFile();
+                    }
+                    else if (e.KeyCode == System.Windows.Forms.Keys.S)
+                    {
+                        SaveFile();
+                    }
+                    else if (e.KeyCode == System.Windows.Forms.Keys.N)
+                    {
+                        OpenNewFile();
+                    }
                 }
             });
+            scintilla.Commands.AddBinding(Keys.V, Keys.Control, ScintillaNET.BindableCommand.Paste);
 
             this.SizeChanged += (delegate (object sender, System.EventArgs e)
             {
@@ -147,6 +168,31 @@ namespace glFy
             this.SizeChanged += TextEditor_SizeChanged;
 
             this.ResumeLayout();
+        }
+
+        private void OpenNewFile()
+        {
+            if (textChanged)
+            {
+                System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show("Save chages?", "Save Changes",
+                                                                                           System.Windows.Forms.MessageBoxButtons.YesNoCancel,
+                                                                                           System.Windows.Forms.MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    if (!SaveFile())
+                    {
+                        return;
+                    }
+                }
+                else if (result == DialogResult.Cancel)
+                {
+                    return;
+                }
+            }
+            scintilla.Text = starterCode;
+            fileLocation = null;
+            textChanged = false;
+            updated = true;
         }
 
         public bool CloseEditor()
@@ -188,23 +234,6 @@ namespace glFy
             {
                 Application.Exit();
             }
-        }
-
-        private void MenuStrip_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
-        {
-            if (e.Modifiers == System.Windows.Forms.Keys.Control)
-            {
-                if (e.KeyCode == System.Windows.Forms.Keys.O)
-                {
-                    OpenFile();
-                }
-                else if (e.KeyCode == System.Windows.Forms.Keys.S)
-                {
-                    SaveFile();
-                }
-            }
-
-            this.ActiveControl = scintilla;
         }
 
         private void OpenFile()

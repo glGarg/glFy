@@ -105,7 +105,7 @@ namespace glFy
                     {
                         if (shader.Type == ShaderType.FragmentShader)
                         {
-                            shader.FileLocation = editor.FileLocation;
+                            shader.FileLocation = editor.FileLocation != null ? editor.FileLocation : shader.DefaultFragmentShader;
                             shader.Compile();
                         }
                     }
