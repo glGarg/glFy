@@ -76,13 +76,7 @@ namespace glFy
             open.Text = "Open    Ctrl-O";
             open.Click += (delegate (object sender, System.EventArgs e) 
             {
-                if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    // open text in textbox
-                    fileLocation = openFileDialog.FileName;
-                    scintilla.RawText = File.ReadAllBytes(fileLocation);
-                    updated = true;
-                }
+                OpenFile();
             });
 
             saveFileDialog = new System.Windows.Forms.SaveFileDialog();
@@ -92,17 +86,7 @@ namespace glFy
             save.Text = "Save      Ctrl-S";
             save.Click += (delegate (object sender, System.EventArgs e)
             {
-                if (fileLocation == null && saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    // open text in textbox
-                    fileLocation = saveFileDialog.FileName;
-                }
-
-                if (fileLocation != null)
-                {
-                    WriteTextToFile(fileLocation);
-                    updated = true;
-                }
+                SaveFile();
             });
 
             exit = new System.Windows.Forms.ToolStripMenuItem();
@@ -171,26 +155,14 @@ namespace glFy
                                                                                                 System.Windows.Forms.MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    if (null != fileLocation)
+                    if (SaveFile())
                     {
-                        WriteTextToFile(fileLocation);
                         System.Windows.Forms.Application.Exit();
                     }
                     else
                     {
-                        if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                        {
-                            // write file at this location with given name
-                            fileLocation = saveFileDialog.FileName;
-                            WriteTextToFile(fileLocation);
-                            System.Windows.Forms.Application.Exit();
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                        return false;
                     }
-                    // save
                 }
                 else if (result == DialogResult.No)
                 {
@@ -220,33 +192,64 @@ namespace glFy
             {
                 if (e.KeyCode == System.Windows.Forms.Keys.O)
                 {
-                    if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                    {
-                        fileLocation = openFileDialog.FileName;
-                        scintilla.RawText = File.ReadAllBytes(fileLocation);
-                        updated = true;
-                    }
+                    OpenFile();
                 }
                 else if (e.KeyCode == System.Windows.Forms.Keys.S)
                 {
-                    if (null == fileLocation)
-                    {
-                        if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                        {
-                            // write file at this location with given name
-                            fileLocation = saveFileDialog.FileName;
-                            WriteTextToFile(fileLocation);
-                        }
-                    }
-                    else
-                    {
-                        // use saved name
-                        WriteTextToFile(fileLocation);
-                    }
+                    SaveFile();
                 }
             }
 
             this.ActiveControl = scintilla;
+        }
+
+        private void OpenFile()
+        {
+            if (textChanged)
+            {
+                System.Windows.Forms.DialogResult result = System.Windows.Forms.MessageBox.Show("Save chages?", "Save Changes",
+                                                                                        System.Windows.Forms.MessageBoxButtons.YesNoCancel,
+                                                                                        System.Windows.Forms.MessageBoxIcon.Question);
+                if (result == DialogResult.Yes)
+                {
+                    if (!SaveFile())
+                    {
+                        return;
+                    }
+                }
+                else if (result == DialogResult.Cancel)
+                {
+                    return;
+                }
+            }
+
+            if (openFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                fileLocation = openFileDialog.FileName;
+                scintilla.RawText = File.ReadAllBytes(fileLocation);
+            }
+        }
+
+        private bool SaveFile()
+        {
+            if (null == fileLocation)
+            {
+                if (saveFileDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    // write file at this location with given name
+                    fileLocation = saveFileDialog.FileName;
+                    WriteTextToFile(fileLocation);
+                    return true;
+                }
+            }
+            else
+            {
+                // use saved name
+                WriteTextToFile(fileLocation);
+                return true;
+            }
+
+            return false;
         }
 
         private void WriteTextToFile(string filepath)
