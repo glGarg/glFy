@@ -19,6 +19,18 @@ namespace glFy
         private System.Windows.Forms.ToolStripMenuItem exit = null;
         private System.Windows.Forms.OpenFileDialog openFileDialog = null;
         private System.Windows.Forms.SaveFileDialog saveFileDialog = null;
+        private System.Windows.Forms.ToolStripMenuItem edit = null;
+        private System.Windows.Forms.ToolStripDropDown editDropDown = null;
+        private System.Windows.Forms.ToolStripMenuItem cut = null;
+        private System.Windows.Forms.ToolStripMenuItem copy = null;
+        private System.Windows.Forms.ToolStripMenuItem paste = null;
+        private System.Windows.Forms.ToolStripMenuItem undo = null;
+        private System.Windows.Forms.ToolStripMenuItem find = null;
+        private System.Windows.Forms.ToolStripMenuItem replace = null;
+        private System.Windows.Forms.ToolStripMenuItem help = null;
+        private System.Windows.Forms.ToolStripDropDown helpDropDown = null;
+        private System.Windows.Forms.ToolStripMenuItem about = null;
+        private System.Windows.Forms.ToolStripMenuItem viewHelp = null;
         private ScintillaNET.Scintilla scintilla = null;
         private string fileLocation = null;
         private string starterCode = "";
@@ -118,8 +130,87 @@ namespace glFy
             file.Text = "File";
             file.DropDown = fileDropDown;
 
+            cut = new System.Windows.Forms.ToolStripMenuItem();
+            cut.Text = "Cut              Ctrl-X";
+            cut.Click += (delegate (object sender, System.EventArgs e)
+            {
+                scintilla.Commands.Execute(ScintillaNET.BindableCommand.Cut);
+            });
+
+            copy = new System.Windows.Forms.ToolStripMenuItem();
+            copy.Text = "Copy           Ctrl-C";
+            copy.Click += (delegate (object sender, System.EventArgs e)
+            {
+                scintilla.Commands.Execute(ScintillaNET.BindableCommand.Copy);
+            });
+
+            paste = new System.Windows.Forms.ToolStripMenuItem();
+            paste.Text = "Paste           Ctrl-V";
+            paste.Click += (delegate (object sender, System.EventArgs e)
+            {
+                scintilla.Commands.Execute(ScintillaNET.BindableCommand.Paste);
+            });
+
+            undo = new System.Windows.Forms.ToolStripMenuItem();
+            undo.Text = "Undo           Ctrl-Z";
+            undo.Click += (delegate (object sender, System.EventArgs e)
+            {
+                scintilla.Commands.Execute(ScintillaNET.BindableCommand.Undo);
+            });
+
+            find = new System.Windows.Forms.ToolStripMenuItem();
+            find.Text = "Find             Ctrl-F";
+            find.Click += (delegate (object sender, System.EventArgs e)
+            {
+                scintilla.Commands.Execute(ScintillaNET.BindableCommand.ShowFind);
+            });
+
+            replace = new System.Windows.Forms.ToolStripMenuItem();
+            replace.Text = "Replace      Ctrl-H";
+            replace.Click += (delegate (object sender, System.EventArgs e)
+            {
+                scintilla.Commands.Execute(ScintillaNET.BindableCommand.ShowReplace);
+            });
+
+            editDropDown = new System.Windows.Forms.ToolStripDropDown();
+            editDropDown.Items.Add(undo);
+            editDropDown.Items.Add(cut);
+            editDropDown.Items.Add(copy);
+            editDropDown.Items.Add(paste);
+            editDropDown.Items.Add(find);
+            editDropDown.Items.Add(replace);
+
+            edit = new System.Windows.Forms.ToolStripMenuItem();
+            edit.Text = "Edit";
+            edit.DropDown = editDropDown;
+
+            about = new System.Windows.Forms.ToolStripMenuItem();
+            about.Text = "About       ";
+            about.Click += (delegate (object sender, System.EventArgs e)
+            {
+                System.Diagnostics.Process.Start("https://github.com/glGarg");
+            });
+
+            viewHelp = new System.Windows.Forms.ToolStripMenuItem();
+            viewHelp.Text = "View Help";
+            viewHelp.Click += (delegate (object sender, System.EventArgs e)
+            {
+                System.Diagnostics.Process.Start("https://github.com/glGarg/glFy");
+            });
+
+            helpDropDown = new System.Windows.Forms.ToolStripDropDown();
+            helpDropDown.Items.Add(edit);
+            helpDropDown.Items.Add(about);
+            helpDropDown.Items.Add(viewHelp);
+
+            help = new System.Windows.Forms.ToolStripMenuItem();
+            help.Text = "Help";
+            help.DropDown = helpDropDown;
+
             menuStrip = new System.Windows.Forms.MenuStrip();
             menuStrip.Items.Add(file);
+            menuStrip.Items.Add(edit);
+            menuStrip.Items.Add(help);
 
             scintilla = new ScintillaNET.Scintilla();
             scintilla.ConfigurationManager.Language = "cpp";
@@ -157,7 +248,6 @@ namespace glFy
                     }
                 }
             });
-            scintilla.Commands.AddBinding(Keys.V, Keys.Control, ScintillaNET.BindableCommand.Paste);
 
             this.SizeChanged += (delegate (object sender, System.EventArgs e)
             {
