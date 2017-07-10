@@ -9,6 +9,6 @@ Tool to edit and render GLSL pixel shaders in real time.
 Use starter uniform variable code to write pixel shaders and then save to render.
 
 #### Screen Capture  
-  ![Screenshot](http://i.imgur.com/sK76wvE.jpg "VoxelsScreenshot1")
+  ![Screenshot](http://i.imgur.com/sK76wvE.jpg "Screenshot0")
   
   
