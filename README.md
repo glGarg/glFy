@@ -1,6 +1,4 @@
 # glFy
-
-#### About glFy
 A tool to edit and render GLSL pixel shaders in real time.
 
 #### How To Use
